@@ -1,0 +1,12 @@
+#!/bin/bash
+
+case "$1" in
+    "start")
+        sudo systemctl start waydroid-container.service ;;
+    "stop")
+        sudo systemctl stop waydroid-container.service ;;
+    "fix-controllers")
+        sudo /usr/bin/bash -c 'echo add > /sys/devices/virtual/input/input*/event*/uevent' ;;
+    *)
+        echo "Usage: $0 {start|stop|fix-controllers}" ;;
+esac

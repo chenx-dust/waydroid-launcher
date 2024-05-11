@@ -1,0 +1,34 @@
+#!/usr/bin/bash
+
+source /etc/default/waydroid-launcher
+
+# Kill any previous remnants
+if [ "$(systemctl is-active waydroid-container.service)" == 'active' ]; then
+	pkexec /usr/bin/waydroid-launcher-polkit-helper stop
+fi
+
+# Check if Waydroid is initialized, initialize if not
+if grep -qz 'not initialized' <<< $(/usr/bin/waydroid status); then
+	exit 1
+fi
+
+# Launch Cage & Waydroid
+pkexec /usr/bin/waydroid-launcher-polkit-helper start
+if [ -z "$(pgrep wlr-randr)" ]; then
+	cage -- bash -c "wlr-randr --output X11-1 --custom-mode ${WAYDROID_WIDTH:-1280}x${WAYDROID_HEIGHT:-800}; sleep 1; waydroid show-full-ui &> /dev/null &" &
+fi
+
+# Fix controllers, we know Waydroid has started because surfaceflinger is running
+while [ "" ==  "$(pgrep surfaceflinger)" ]; do
+    sleep 1
+done
+sleep 10
+pkexec /usr/bin/waydroid-launcher-polkit-helper fix-controllers
+
+# Waydroid is now live!
+# Wait for exit and then clean up
+while [ -n "$(pgrep cage)" ]; do
+    sleep 1
+done
+
+pkexec /usr/bin/waydroid-launcher-polkit-helper stop

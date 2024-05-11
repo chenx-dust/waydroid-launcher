@@ -12,7 +12,7 @@ license=('Apache')
 groups=()
 depends=('waydroid' 'wlr-randr' 'cage' 'polkit')
 optdepends=(
-	'waydroid-scripts-git: for easily managing waydroid'
+	'waydroid-script-git: for easily managing waydroid'
 )
 makedepends=('git')
 source=("${_gitdir}::git+https://github.com/${_gitown}/${_gitdir}.git")
